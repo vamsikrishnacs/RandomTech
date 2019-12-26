@@ -1,0 +1,67 @@
+object modelling techniques
+
+EJB
+	session bean stateful beans to keep track of order
+	stateless bean	async send email one time activity
+	singleton beans one time load common to all users
+
+	message beans listen object to queues and updates all the nodes
+		send updates to nodes via JMS QUEUE job to cluster
+		send updates to JMS topic no idea of consumers/location etc
+
+Instance variable a=b vs Copy constructor
+
+Interface vs abstract
+	no data only public methods without memory
+	abstract is expensive with a predefined behaviour common to all and strict abstract funcs to implement
+
+Assocation vs aggregation vs Compostion
+
+Inheritance
+	Vehicle
+	     abstract vehicle
+		abstract motorship extends vehicle
+			sailboat,cruise extends motorship
+	     
+
+	Deck
+		Deck
+			Card[52]
+		               Card
+				   Card(v,Suit)
+                Deck.deal()
+ 		player.hand()
+
+1-many compostion delete all    cat-parts   Cart-Cartitems Doc-Page
+1-many aggregation no delete    course- students  category-products library-books
+1-1 assocation  student-course  product-orderitem 
+
+inheritance: Account-Savings/Credit
+https://examples.javacodegeeks.com/core-java/design-patterns/strategy/implement-a-shopping-cart-using-the-strategy-pattern/
+https://www.uml-diagrams.org/examples/hospital-domain-diagram.html
+
+Payment
+
+	Ordermanagement			Billingaddress,confirm,Paymentstatus,Warehouse
+				Cart
+					calucalebill
+						Dicounted
+						offers						
+	Payment				pay(Payment-method)
+				type
+					credit
+					debit
+					online
+					emi
+					pay(amoumt)
+
+
+Class-collections
+
+Cart- list<cartitems>
+Course - list<students>
+
+Controller
+
+cart.checkout(),calculatebill(),
+deck.deal(),player.hand()

@@ -1,0 +1,186 @@
+Caching
+	Local Cache
+	db cache
+	Remote Cache(Redis) in clustered
+
+	Techniques:
+		write through
+		Lazy Cache
+	What to Cache
+		Result
+		specific fields
+
+
+Read Bottlenecks:
+	Disk I/O
+	Sql tuning queries
+	Distributed Disk
+	Relica Read
+
+
+
+RDBMS
+
+        write
+		write to all data locations for ACID(DISK I/O HEAVY)
+		partition difficulty
+
+	caching
+		Use redis to store result sets
+
+DYNAMO
+	large scale,low latency
+	write favoured
+	always available
+
+	write:
+		n/2 nodes async n conflict resolution
+		write through coordinator
+	Search
+		Use SQL
+		
+	Partioning
+		DIsk
+		B Trees
+		Primary Index buffer
+
+	
+Usecase
+	no strict consistency, json docs
+
+Partioning
+	independent nodes
+	Sharding
+	
+	Store on multiple nodes and consenus
+
+Search
+	Primary/ Secondary Indexes
+	Primary Key/Shard Key
+
+DataStructures
+	key : json /	put,get
+
+Concurrency - ??
+
+
+
+things to note:
+
+
+   Choose over Consitency(Configurable) and Performance
+	Consistent:	
+		write happens only after all replica sets or nodes return with yes
+			cases:
+				last write wins 
+				counter based. and update and progress towards consistency.(recover at run time,Consitency delayed with replica sets updating on failures)
+		Read
+			Route request to nearest replica set(physically)
+			cases:
+				Return the first in the ring  (o(1) hash value)  weak consistency
+				Return the most updated value (after checking all replica nodes) Strong Consistency 
+
+	Peformance:
+		QUorum p2p
+		Master-Slave							|
+		Master - master							|	USe replica sets to scale reads
+		Use master to write and slave nodes to scale reads		|
+		Use any node to get o(1) recovery
+					
+
+	Replication & Distribution	
+		Use consitent Hasing in a ring (Cassandra,Dynamo) AP
+		In memory (Master-Slave) with persistent Disk (Redis) CP
+		Master- Slave and Sharding the data vertically (MYsql)
+		Master - Slave	with (3 R ) Replica sets	
+		Primary/Secondary 	(mongo) CP
+
+	Scalabitiy:
+		Redis : In Memory less Scalable
+		Mysql : Shards to scale and scale vertically
+		Cassandra: Write through linearly Scalable as you add nodes / write heavy/ less write time /Configurable Consistency
+		Dynamo:	Auto Sharding
+		Mongo : Auto Sharding / less write time /Configurable Consistency /Strong Consistency /QL/iNDEXES
+
+	
+MONGODB
+	CP
+	Document structured objects
+	full text search,reactive event driven
+
+	COnfigurable Consistency
+	AutoBalancing the nodes at run time (casasndra move lighter node to higher,mongo)
+	MultiCenter Replication according to schemes
+		for write heavy loads -> good latency with good consistency
+	Auto Sharding
+	Intelligent Placement and good write latency with less conflicting writes
+
+Partioning/Replication Strategy
+	Replica sets (50R) and Sharding
+	Store on multiple nodes and consenus
+	Multiple Replication Policies
+		Ranged Sharding(use accoridng to shard key value)
+		Hash SHarding
+		Zoned
+
+Search
+	Primary/ Secondary Indexes
+	
+
+DataStructures
+	Docs/Full text search
+	Writes issued to Primary followed by Secondary 
+
+	Shards(Replica Sets) Config  Routers
+
+Concurrency - ??
+
+Recovery:
+	Leader Election	with Secondary
+
+
+REDIS
+	Small Scale In -memory
+	No query language facilities
+        poor concurrency for object storage on read and update
+	adapter for managing race conditions and object persistence
+
+	write:
+		master and sync to slave
+	read
+		master distributes reads to slaves
+
+Replication:
+	read heavy
+	write - write to job queue
+	write to Inmemory and persist
+	Master - Slave basic level()
+
+Usecase:
+	full text x
+	logging,metadata,message queues,caching,pre computed data
+
+Paritioning:
+
+	Store data in memory and persist to disk async
+
+Search
+	not full text search
+
+Data Structures:
+	list,hash,set / put/get/append
+
+Transactions
+	MULTI exec
+
+MONGODB
+	Document db
+	SQL Like query language
+
+
+Usecase:
+	comments,product items,	
+
+
+Search
+	Search on Collections and docs

@@ -1,0 +1,94 @@
+
+pacelc
+
+latency- consistency tradeoff @ normal operation
+availability- consistency tradeoff @ partition operation
+
+
+thoughts:
+
+Availability : to ensure a reasonable stale response : BASE in all cases
+Consistency: to read the more recent writes, and all copies remain the same 
+
+CP: Choose consistency over availability ,return failure if data is not consistent eg: Redis,Mongo
+AP: Choose availability,return reasonale stale response and consistency on reads(repair,replica synchornization) eg: dynamo,cassandra, carts
+
+
+Capabilities:
+
+MYSQL: full querying capabilities,complex joins,fully consistent,Concurrent Transactions
+
+Dynamo: low latency read/writes, only simple lookups, Primarykey/sort keys,LSI, always writeable, conflict resolution on reads. R:N,Elastic
+
+Cassandra: Linearly scalable writes, CQL, Column families,Sequential Disk Read,Write heavy,Hash Sharding-no Scans only lookups, elastic
+
+Redis: Cache,Master-Slave Inmemory hashslots,Always consistent
+
+Mongodb: Range Sharding for faster Scans
+
+Architecuture:
+	P2P
+	Master-slave
+	Master-Master
+	Ring
+
+Placement:
+	Consistent Hashing with vnodes
+	Hashing and hash slots
+	Sharding : Range/key/list
+
+	Sharding: Write Scalability
+	Range/List/Hash/Consistent Hashing
+	
+	Range: Efficient Scans,Coordination through Master,Auto Load Balance by detecting hot spots.
+
+Sharding: Write Scalability
+
+Replication: Read Scalability
+	R:3/N/50
+	Commit/Consensus
+	Primary Copy
+	Anywhere update
+	Synchornization: Async write/ Sync write
+	when:
+		Eager: Higher Consistency,higher write times.
+		Lazy: lower Consistency,less write times
+	where:
+		master-slave - Primary takes writes - Replica set Unavailable in case of master fail
+		Master-Master- update anywhere - Versioning,vectorclocks,Gossip,Read Repair
+
+	eager-master-slave : problems
+	lazy -m-s : mongo
+	lazy -m-m : cassandra,dynamo
+
+	Autosharding and loadbalacning: cassandra,no scans eg: consensus
+	Dynamic Sharding - Locators and autobalancing: mongo use locator to keep data uniformly eg: config,hot spots,range partitions
+
+	Reads: Configurable
+		Read anywhere low latency vs Read from quorum(for consistent) high latency
+
+Routing:
+	SIngle Hop Read
+	Topology aware Read
+	Multihop as in P2P
+
+
+Consistency:
+	@ Write Quorum style/p2p or accept by all or accept 1 and write async to replicas
+	@ Read Coordinator single hop to Node(Intelligent Routing), Read n/2 replicas , Repair and resolve conflicts on Read(replica synchr)
+
+
+Conflict Resolution:
+	On write,Quorum,consensus
+	On read, Auto recovery by consenus at run time,gossip style
+	Versioning,
+	Vector Clocks
+	Gossiping
+	Read Repair
+
+Latency: 	Read: Storage Management
+	Read how many replicas to touch
+	Intelligent Routing
+	Strong Consistent Reads vs Low Latency reads
+	
+	Write : how many replicas to touch 

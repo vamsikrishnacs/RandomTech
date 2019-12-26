@@ -1,0 +1,129 @@
+Process:
+
+	Process states(ready/running/waiting)
+	Schedule: 
+		short term - select process
+		long term - get p and place in ready queue
+		
+	PCB: state
+	     i/o
+	     Memory
+	Process:
+		Data
+		Heap
+		Stack
+		Code
+	Queue: 
+		job queue
+		Ready queue
+		Device queue
+	Hierarchy:
+		parent/child
+			share all
+			share subset
+			share none
+		concurrent
+		wait till completion of child
+	fork
+		two copies
+		share some resources
+		
+	termiantion
+		exit()
+			return code and deallocate
+		abort()
+			exceeded resources
+			task asinged to child not rquired
+			parent exit child kill
+IPC
+	Information processing
+	parallel processing
+	Modularity
+
+	Mechanisms:
+		Shared memory(User control,sync issues)
+		Message passing
+		pipes
+		client server
+			sockets
+				tcp
+				udp
+				multicast
+			rpcs
+			RMI
+	
+	Synchronization:
+		Producer -buffer - Consumer problem
+		Buffer / bounded /unbounded
+
+		Message passing
+			send(),receive()
+			links:
+				size,number,varibale,direction
+				shared memory,bus,network
+							
+				direct
+					send(p,smg)
+				indirect
+					mailbox/ports	
+				sync/async
+					blocking send/receive	
+				automatic buffering
+					zero capacity(rendezious or send wait for receive)
+					bounded (sender wait on nth message)
+					unbounded(no wait)
+
+threads
+	pthread
+		create
+		join
+	java
+		runnable
+		run
+	windwos
+
+	thread pool
+		pool
+	fork-join
+	open-mp
+
+
+ds
+consensus
+consistency
+broadcast prmitives
+
+
+Distributed system control techniques (8 hours)
+
+Replication and fault-tolerance;
+
+Voting, primary-backup methods;
+
+Rollback & replay algorithms and correctness conditions;
+
+System resilience versus robustness.
+
+Case studies of distributed systems (5 hours)
+
+Telcordia Resilient Clouds, IBM Websphere,
+
+Cloud and network auditing tools
+
+HPOpenView based system management tools
+
+
+netstat
+lsof
+nslookup
+iptabes
+vmstat
+tcpdump
+iotop
+iostat
+iptraf
+pssact
+monit
+nethogs
+iftop
+minitorix

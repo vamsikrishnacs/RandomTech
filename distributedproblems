@@ -1,0 +1,433 @@
+failure detection
+		Node went down and we got it now
+fault Removal
+		remove the faulty node and make someone as master
+Failure Recovery
+		Recover the lost node
+
+
+fault tolerance in p2p
+	Detecting site failures when a node failed,isolated pieces exist and continue to function
+
+Communication Failure
+	Could be slow messages or lost messages
+	Ack based communucation prone to lost ack's
+	Timeout
+		leads to duplication and message reordering problems
+
+transmission delays
+
+Distributed disagreement problems
+
+	Client doesnt necessarily agree on a possible state
+		as in multiple masters trying to sync with each other
+
+	Time synchronization
+	Consistent distributed state
+	Distributed Mutual Exclusion
+	Transaction commit
+	Termiation
+	Distributed Election
+
+Fault tolerance problems
+	To function in presence of failures
+
+Syncronization
+
+byzatine general
+	leslie lamport 
+		agreement leader/follower pattern
+	3n+1 sites needed 
+
+Distributed mutual exclusion
+	Send a timestamp request to enter a CS
+
+Distributed Election
+
+	Bully
+	Leader Election
+
+Fault tolerant distributed broadcasting
+
+Types of DS
+
+	Peer or Hierarachial
+	
+		peer: 
+			any node can handle but race condition
+		Hieararchial
+			Leader
+				Coordinators
+					Followers
+	Centralized
+		coordinator and election 
+	
+
+Basic Probs
+	Consistency
+	Data Replication (M-M , M-S)
+	Key Space Management (data range,consistent hashing)
+	CAP
+	Latency and I/o Cycles
+
+Types of problems
+	Distributed Mutual Exclusion
+	Consenus							====== MAIN ==== Raft,Paxos,2phase commit
+	Time and clock synchronization
+	Fault Tolerance(Communcation with n non faulty nodes) & Auto Recovery     === SEC ===
+	Quorum / Leader Election  - Rings,Bully					====== MAIN ===== ring/bully
+	Durability and Write ahead Log  				=== SEC ===
+	Membership
+	Ordering of events
+
+Distributed Transactions
+	Paxos,Raft,Gossip Protocol
+
+Distributed replica management
+	message loss and node crashes
+		2pl and 3pl
+	
+
+
+Consenus
+	
+Paxos
+	Non Byzantine async network consensus
+BFT vs p2p
+	byzantine async
+POW
+	byzantine blockc hain
+	
+
+
+Distributed Mutual Exclusion
+	Lamports
+	Quorum based ME
+	Token based
+	ricart-agrawala
+
+Consensus and Agreement algorithms
+	agreement In
+		Failure Free system
+		message passing syncrhonous systems with failures
+		message passign async with failures
+		wait free shared memory
+		
+Distributed Communcation
+	Message Passing
+	Shared Memory
+
+Checkpointing and Recovery based algorithms
+
+p2p and overlays
+	checkpoint
+	log based
+	5014688614094594290
+
+
+Replication
+
+	2 cases
+	
+	1.reads can be done on all nodes,while writes are funneled through a coordinator(election) which replicates in an ordered fashion
+	2.A consenus has to be run everytime an update happens.
+		
+Paxos
+	2phase
+
+	1. Proposer sends PREPARE value
+		acceptor accepts and sends promises or fail
+
+	2. Proposer sends PROPOSE 
+		acceptor accepts proposals and commits.
+
+	Leader Election
+		Have a single proposer to do the action of dealing with PREPARE mesasges.
+
+		Bully
+
+	Failures:
+		Multipaxos
+		Group Management
+		Byzantine Failures
+		Replicated In order log
+
+
+Primary Backup Systems vs State Machine Replication
+
+ zookeeper (zab) 	vs Paxos	()
+
+single prosopser + sync phase     vs Multiple Proposers and 2phase commit	
+
+
+Primary Backup Services for Replication
+	Zookper for writes and reads
+
+
+
+
+
+
+
+Primary Questions
+
+
+style, replicate(sync/async) ,resolve conflict
+
+what is the style of Data nodes 						===== 1 ======= c: P2P d: p2p
+	master-slave
+	Quorum style P2P
+	Hierarchial - Coordinator,leader,follower
+	Ring style P2P - Consistent Hashing
+	pastry p2p - multihop
+
+How is the Data persisted							===== 2 ======= c: sequentially written commitlog
+											        inmemory index memtable,writeback cache 
+											disk - sstable
+											d: vectorclock,version to top N healthy nodes,object buffer in main memory and local storage
+	whether snapshot is persisted to Disk at reg intervals
+	Sent to commit log and flushed to Disk
+	Incremental Delta Updates
+
+What is the write behaviour								===== 3 =======c: connect to any node,coordinator
+									             d: async replication,write to 1 and return, sloppy quorum 
+	write returns on quorum acceptance
+	write returns on accept all
+	write return immediate and replicate async
+	write happens anywhere
+	write happens at coordinator
+
+what is the read behaviour								===== 4 =======c: coordinator decides which node 												to connect to in the ring,snitch decides replica
+
+											d: partion aware client library, LB,FIRST N 												nodes,preference lists
+	Does half need to say yes,
+	It is based on hash fetch
+	Does the coordinator involve in read
+
+what is the replication strategy(Partioning algorithm)							
+											===== 5 =======c:murmur3partitioner,rep:2,
+											networktopolgy strategy to place in ring,snitch 											topology,consistent Hashing
+										d: consistent hashing, rep:N
+																												
+	on write repliacte async/sync
+	latency issues in repliaction
+	how is the consenus reached after write while replicating
+
+what are replication algorithms								====
+	Synchronized replication algorithms - strong consistency
+
+what is the consenus algorithm								===== 6 ======= d:Vector clocks with ronciliation 												during reads,versions  
+	how does the nodes accept on a value
+	Log Based Replication
+	Paxos based Proposer and Acceptor based Consensus while replicating
+	2PL
+
+what is the fault tolerance mechanism							===== 7 ======= d: replica synchronization protocol.
+	BFT
+	Paxos
+
+what is the conflict resolution mechanism						===== 8 ======= c:
+													d: at read,antientropy merkle trees
+	Conflict resoltion at read/write
+	Gossip style resolution
+
+what is the memership detection/failure detection algorithm				===== 9 ======= c: gossip,repair mechanism,
+													d: gossip,
+	gossip style
+
+what is the election algorithm in case of coordinators involved in write and read	===== 10 =======
+	Paxos
+
+what is recovery								==== 11 ======= d: Anti-entropy using Merkle trees 
+
+what are replica types								====11 ====  c: all same ,no master-slave
+
+what are the read/write latencies							===== i =======
+
+what are the consistency mechanisms							===== ii ======= d: object versioning , r+w>n
+
+
+what are the availability mechanisms							==== iii=======	snitch,Dynamo: AP d: enough routing information local to route single hop,sloppy quorum
+1VE]d1XB)vKCKsL
+
+REDIS
+
+	Cluster - Master- Slave ->disk aof,rdb persistence
+	
+	replication - master - slave with 1:1 replication and sharding on n nodes 
+	
+		auto shardding using hash slots, and raft like failure detection
+		async m-s replication
+
+https://www.brianstorti.com/replication/
+Replication
+
+master-slave or primary-backup replication -> one master handles 
+multi master replication - > requires some fault tolerance and distributed locking mechanism. -> any replica can handle
+
+Passive: Process request on single replica and transfer result to other replicas
+Data Replication - Passive used only in reads
+	Transactional Replication
+		ACID
+	Statemachine Replication
+		Consensus replication,Paxos,Chubby system,Replicated Log
+	Virtual Synchrony
+
+Active
+	perform same request at every replica
+
+Computation Replication - Active used to provide fault tolerance and take over
+
+
+Consensus:
+
+Primary-backup 
+	syncrhonous - consistent but low performance and high latency
+	asyncrhonous - avialbale but stale data
+
+Asynchronous strategies
+	1.snapshot
+	2. all data at master
+	3. rerun updates at every replica node
+
+master-slave - low throughput all writes on master
+	async:
+		through master and then to slave
+			all write at master and slave as a backup
+
+multimaster - high throughput but resoltion overhead at scale and not consistent
+
+   SINGLE LEADER
+	async:
+		through any master and resolve conflicts at run time
+			all write can be anywhere and they need to be self repaired and propagated
+		challenges:
+			how to identify dead leader
+			how to reach consensus
+			how to identify when to resolve conflict	
+			conflict resoltion strategy
+				last write win
+				split brain challenge
+	async:
+		through any node which knows how to route requests
+	
+    MULTI LEADER 
+		Syncrhonous replication
+		async replication
+			
+no leader
+
+quorums
+
+=============================== SINGLE REQUEST/ CONCURRENCY AND IPC ====================================================================
+
+Workers Patterns
+	
+	queue -> recevier thread -> Pool of threads(synchrnous multithreading)  mysql
+
+	1 core - 1 worker with multiple threads (event driven loop)  nginx
+        
+	connection queue -> prefork worker threads()  	apache worker model
+
+Client Patterns
+	connections to db through thread pool
+        
+	Concurrency Models
+		
+		synchrnous multithreading					synchronous blocking -? thread switching
+		parallel assembly line workers (react)				synchronous blocking -? react
+		asynchrnous event driven models (event loop) parallel and conurrent I/O using i/o multiplexing -?select./poll
+		asyncio (using asynchronous) no blocking 			-? 
+	
+
+Producer - Consumer Problem
+	1.within box(ipc)
+		thread to thread (message passing/shared memory/pipes/mailboxes/ports/file/buffer) or process to process (IPC within box)
+				--> buffer limited/unbounded
+	2.box-box (ipc)
+		message passing (send -receive) tcp sockets sync/async/broadcast/multicast ->buffering -->networking I/O
+
+	fast producer - slow consumer (shared memory problem)
+			ring buffers(multiple producer - multiple consumer)
+
+
+MESSAGE QUEUES
+	kafka
+		highly scalable ..zookeeper.. MQ with replicated nodes
+	rabbitmq
+		lesser scalable .. exchanges and queues .. MQ with persistence and clever clients
+	zeromq
+		no broker .. only SOCKETS with inproc,ipc,tcp,protocols ,pgm/epgm
+		with patterns
+			p2p
+			req-rep (sync)
+			pub-sub (async)
+			push-pull (async)
+
+=============================== MULTIPLE REQUESTS /MQ======================================================================
+
+messaging patterns
+
+	use plain tcp sockets point to point
+		box send/receive sync -->tcp
+		
+	use multicast
+		may be sync/async
+
+	use zeromq advanced tcp sockets with sync/async/pushpull/pubsub patterns
+		with 220000 msgs/sec
+
+  DECOUPLING multiple producer - multiple consumer problems
+	use MQ like rabbit/kafka/sqs to decouple loads of producers and consumers using a sharded/replicated broker or MQ
+
+=============================== SEARCH AND CONNECTION HANDLING AND THROUGHPUT===================================================  
+
+full text search
+
+	use elastic search for doc search
+		-> use indexing and parallel queries among shards to achieve 1.2 million search in 50 mircosec.
+
+        use tsdb /OLAP for fast querying of aggregated metrics
+
+Connections
+	
+	shortlived vs persistent connections in DB
+
+	Techniques:
+		persistent connection   (sql db)
+		parallel connections    (browser)
+		pipelined connections   (1 connection many requests)
+
+		Batching request	
+		preforking connections(pools)
+
+
+Throughput
+
+	consistency vs latency in NOSQL
+	connections vs latency vs throughput in Databases
+	connections vs load vs no of clients
+
+200k	|				'	
+120k	|                          ------ \
+80k	|  			'          \
+50k	|	       '--------            \
+25k	|     -------''	                     \
+10k	|   -'______________________________
+	  32    64   128    256     512    1024   2048
+
+
+	clients(parallel connections) vs throughput (vary with cpu load)
+
+
+==================NEW ======================================
+
+
+DataBase access Patterns
+Locking Patterns in DB(Concurrency in DB)
+Shared Nothing lambda stateless archiecture
+ec2 instances and virtual machine deployment
+cloudfront and cdn
+
+
+

@@ -1,0 +1,868 @@
+sacling webservers
+
+load balancing
+scaling groups
+
+	1.private servers
+	2.cloud servers/maintainence
+		configuration
+		restore/recovery
+
+scaling databases
+
+	read
+	multimaster /write
+	shard/partitoning
+	connection pooling
+	conenection load balancing
+
+
+scaling storage
+
+	object storage(whole network/api)(s3/google storage)
+	local storage(app)
+	nfs(protocol/mount)app (EFS)
+	mysql(block storage-high performance IO) (EBS/Disks)
+
+
+Databases:
+
+	Immediate consistency/eventual consistency
+	constrains/keys - nosql storage (mysql vs nosql)
+	replication()
+	High Availability(HA)
+	Transactions(mysql) ok nosql x
+	Locking(row level)/parallel writes
+	
+	Storage:
+		RAM
+		Berkelydb
+		random access file storage
+		Flush Disk(I/O LAG	)
+
+	Lock:
+		Locking
+		MVCC
+	Replication:
+		Master-slave(Lag)
+			Relicate snapshot
+			Replicate transaction (incremental updates)
+		Master-Master
+		Async/sync
+		Async lose writes
+		Sync (write latency)
+
+	
+	Paritioing:
+		Range/List/Conistent Hash
+
+	Serialization:
+		Locking(2p) for strong consistency
+		MVCC Eventual consistency
+		
+
+Servers
+	Replication
+	failover
+	Partioning/Sharding - Hashing,Range,List
+
+Application considerations:
+	Resource usage:
+	CPU load
+	Memory usage
+	Disk I/O
+	Read/write database queries
+	Network Bandwidth
+	Application statistics
+	number of requests
+	response time
+
+Eventual consistency:
+	multi version concurrency control
+\
+	replication, 
+\	versioning, 
+	locking, (sql)
+	transactions,(sql) 
+	sorting, 
+	Consistent hashing (Node addition/deletion to cluster and auto recovery)
+	Redis (KV STORE)
+		CP
+		Master-slave
+		Storage:RAM
+		Node addition: System shutdown
+		allows: tuple,lists
+		Technique: Distributed hashing/Key Ranges
+		# ERROR! Mechanism: Locking,Aysnc replication(copies must be updated before the operation is complete))
+		Peformance: 100K gets/sets per second on an 8-core server.
+
+		features:
+			master-slave
+			hashslots(nodes) instead of consistent hashing
+			6379 primary
+			10000 cluster bus HA
+			No downtime with hashslots
+			1-1 replica(master-slave)
+			no locking(No strong consistency) because of async replication
+			async replication (lose writes)
+
+		working:
+			create-cluster
+			start cluster(7000.....7006)(with replica 1-1)
+			3M-3S
+			ADD NODE(master/slave)
+				add hash slots
+			add replica
+
+	Dynamo (KV STORE)
+		Decentralized Replication synchronisation mechanism
+		object versioning for consistency
+		ACID	
+				
+		features:
+			Storage:
+			Node addition: dynamic
+			allows: range keys,sortkeys,secondary indexes
+			Technique: consistent hashing with virtual nodes
+			Mechanism: Eventual consistency,Aysnc replication(copies must be updated before the operation is complete))
+			Peformance: 100K gets/sets per second on an 8-core server.
+		working:
+			conflict resoltuion at reads(push and reply if success,lag)
+			ADD NODE(Symmetric nodes)
+			Routing : single hop with routing (unlike multihop p2p where request have latency issue)
+			RIng replication
+			Failure Dtection : gossip decentralized
+	
+	Cassandra:
+		AP
+		write intensive
+		All nodes same(Distributed)
+		Consistent Hashing
+		No new node addtion(on demand)
+
+		Shard - single server,replicate on multiple shards
+			
+
+
+	Memcached:(Distibuted in memory index)
+
+	COuchdb(Collections)
+		map reduce
+		async replication for scalability
+		mvcc
+	mongodb(index on  collections)
+		Document store
+		Range based Partioning
+			On Write - shard key
+		Automatic redistribution to shard data
+		no locking
+		Automatic sharding
+		Replication as failover
+		No global consistency
+		atomic writes
+		Async replication
+		New node addtion(scale reads-add replica /scale write - add new shards)
+		Shard - replica set(multiple servers) leader election
+
+	Cassandra:
+		No locking
+		Async replication
+
+CA:
+	RDBMS,postgres
+AP:
+	Dynamo,Cassandra,COuchdb,simpledb
+	Riak,voldemort,tokyo cabinet
+CP:
+	Redis,Mongo,Bigtable,hbase,memcached,scalaris
+
+kvstore - SIngle index,IN MEMORY,distributed
+document store(No acid)- Secondary index,nested docs,Collection and index defined over collections
+Extensible object - Records/sharding ,column groups
+	
+
+Usecase:
+
+kv: one type of object 
+Document store: multple types
+Extensible record: stronger concurrency,cluster by country
+
+
+acid / free of locks, out-of-date data, update collisions, and consistency.
+considerations - disk access,network communication, index operations,locking
+
+
+
+Table 1. System Comparison (grouped by category)
+
+System ConcContol DataStorage Replication Tx
+
+Redis 	 	Locks 	RAM 	Async N
+MongoDB 	Locks 	Disk 	Async N
+Dynamo 		MVCC 	Plug-in Async N
+Cassandra 	MVCC 	Disk 	Async L
+HBase 		Locks 	Hadoop 	Async L
+MySQLCluster 	ACID 	Disk 	Sync  Y
+
+Scalaris Locks RAM Sync L
+Tokyo	 Locks RAM ordisk Async L
+Voldemort MVCC RAM or BDB Async N
+Riak MVCC Plug-in Async N
+Membrain Locks Flash + Disk Sync L
+Membase Locks Disk Sync L
+SimpleDB None S3 Async N
+Couch DB MVCC Disk Async N
+Terrastore Locks RAM+ Sync L
+HyperTable Locks Files Sync L
+BigTable Locks+stamps GFS Sync+Async L PNUTs MVCC Disk Async L
+VoltDB ACID,no lock RAM Sync Y
+Clustrix ACID, no lock Disk Sync Y
+ScaleDB ACID Disk Sync Y
+ScaleBase ACID Disk Async Y
+NimbusDB ACID, no lock Disk Sync Y
+
+
+table2:
+
+Table 1: Summary of techniques used in Dynamo and
+their advantages.
+Key K
+A
+G
+Technique Advantage
+Partitioning: Consistent Hashing Incremental Scalability
+High Availability: for writes Vector clocks with reconciliation during reads Version size is decoupled from update rates.
+Handling temporaryfailures: Sloppy Quorum and hinted handoff Provides high availability and durability guarantee when some of the replicas 				are not available.
+Recovering from permanent failures : Anti-entropy using Merkle trees Synchronizes divergent replicas in the background.
+Membership and failure detection : Gossip-based membership protocol and failure detection. Preserves symmetry and avoids having a 			centralized registry for storing membership and node liveness information
+
+To focus:
+
+Sync vs async replication
+Confict resoltion
+acid vs base consitency strategies
+
+
+Servers
+
+	Connection handling
+		apache	mpm workers/process
+		nginx	event workers/pol
+	Configuration
+		.ht access files
+		distributed
+	Static vs Dynamic Content
+	Modules
+		dynamic compilation	
+		static compliation
+	Uri mapping
+	Document structure
+
+
+
+Load Balancers
+
+
+Network topology
+	LAN
+	WAN
+	WIFI
+
+	PHYSICAL SETUP /vs CLOUD ARCHITECTURE
+	
+Network interfaces/switches/hubs/routers
+	eth0
+	cables
+	Bus/Ring/Mesh..
+	ssh
+	etc/hosts
+	DNS mapping
+
+
+
+
+
+
+
+
+
+
+======================================Systems (setting up the architecture goals) =====================================
+
+
+0.Scaling webserves
+	nginx
+	apache
+
+1.Continuous Integration/Deployment	
+	Jenkins
+
+2.Fault Tolerance(Availabity)
+	P2P
+	Master-slave
+
+3.Auto Recovery
+	Failure Recovery
+	Saving the state
+
+4.State persistence
+	Databases
+	
+
+5.Storage Systems
+	NOSQL
+	Analytics
+	
+6.Logging
+
+7.Monitoring
+	Nagios
+	Unix admin tools
+	Perfmon	
+
+8.Network Setup
+	Creatting Network
+	Provising capacity
+	
+	Auto Setup of Cluster
+		Ansible
+		Puppet
+		
+	Setting firewalls
+	Setting access rules
+
+9.User Restriction
+
+	Rate Limiting
+	USer authentication
+	Acces Rules
+
+10.Security
+	SSL
+	https
+
+
+
+Applications
+
+	OS
+		linux
+	Server
+		apache
+	db
+		mysql
+	Langugae
+		php
+	
+	Frameworks
+		Django
+		jsp/servlets
+		PHP
+		
+			Session Management
+			Cookies
+			Database Models(MVC)
+
+	Caching
+		
+	Scripting
+		Server side
+			Node
+			php
+			java
+
+		client
+			html
+			dom
+			js/angular
+
+
+	Patterns
+		with client
+		with db
+
+	Scaling api's
+
+	
+
+Issues in a Scalabe setup
+
+	Load Balancer Configuration
+	Network Latency between server-database server
+	Bandwidth 
+
+
+
+======================================Servers (setting up the web backend) =====================================
+
+Niginx
+
+	Server blocks
+	
+		default: var/www/html
+
+
+========================
+
+
+NETWORK PROGRAMMING
+	c10k
+	sockets
+		1 thread multiple client
+		1 thread 1 client
+		1 process i client
+	
+	models
+		thread blocking socket
+		thread async io
+		thread non blocking
+	zeromq
+
+	IPC
+		inproc
+			pipe/buffer/named fifo/shared memory
+		tcp
+		udp
+		unicast
+		multicast
+	
+		PROTOCOLS
+
+WEBSERVERS
+	APACHE
+		prefork(process)
+		thread based		
+		parallel event queue(reactor)
+		worker
+	NGINX
+		worker
+		parallel event based		
+
+	64 k client con per port
+	
+
+MANAGED SERVICES
+	SQS
+	SNS	...
+
+PROGRAMMING PRIMITIVES
+
+	Threading for I/o and concurrency 
+		issue with GIL
+		Synchronisation
+	Process pool for parallelism
+		Heavy memory overhead
+		good for computing
+
+	Thread pool
+	gevent
+
+	CELERY
+		distributed
+
+
+
+
+==========================================================
+
+MESSAGE PASSING VS SHARED RESOURCE
+	OS PRIMITIVES(buffer vs send/receive/port)
+        threads/process blocking on share
+        IPC on message passing
+
+CONNECTION OBJECT(socket)
+        send/receive
+        fileno(fd)
+        poll
+
+        Polling
+		POLL multiple connection objects at once wait()
+                Polling involves monitoring of multiple sockets to see if something has happened on them.
+			To solve this issue, the idea of non blocking sockets came. Here is what the server will do:
+			It will maintain a collection of master sockets and the entire clients socket at any time.
+			If anything happens on the socket, the system gets informed (this is done by select method of winsock API).
+			On master socket, we can have the activity that a new client has connected.
+			On the client’s socket, the activity can be that client sends some message.
+			For getting the information, we keep on polling (this is generally done by using an infinite loop in the code) on all the sockets.
+
+	types
+		blocking sync
+		non blocking and poll
+		non blocking async
+			
+
+
+NGINX(5K limit)
+	server block/location block /static content
+C10K
+	poll/kqueue/event aysnc io blocking/non blocking
+
+SQS
+	long vs short polling
+	atleast once vs exactly once delivery(fifo vs standard)	(transactions vs distribution)
+	visibility timeout,delay seconds
+
+	properties
+		Deduplication/message id/ordering/replication/grouping
+
+SERVER TRADEOFF
+	
+
+
+	Forking server(4 process)
+		Forks a process every requests	
+		Parent creates child and gives the connection
+		Overhead
+			Context Switch(time)
+			Memory Copy(on write)
+			Pre-Forking(save forking time but context switch overhead)
+
+	Threading server(1 Thread and multiple handhler threads - 100 threads)
+		Thread for every request
+		Overhead
+			Application handles thread safety or copy of every instance
+			Under heavy load takes too much memory
+				thread stack for each connection and constant switching
+		Dispatcher or listener thread
+			spawns worker threads for processing connection
+	
+	Polling server(1 Thread)
+		Poll on epoll structure for connections
+		Poll on fd's
+
+	Optimum no of threads
+		multithread good if it is I/O Intensive
+	Mutiprocess:
+		4 cores - 32 workers (CPU bound) lot of wasted memory
+		Bad for concurrent programming such as long pool requests
+
+	Jruby
+		1 process run on 4 core
+
+	Apache MPM 
+		Combined model
+Synchronous blocking I/0
+
+     whenever shared resource blocking and contention happens
+
+Thread vs Process
+
+
+share resource / Own address space
+I/o intesnive good /bad
+less memory /More memory and overhead time switching
+
+
+Event driven IO
+	Notification (kpool)based and single threaded
+	Stacked up queue under heavy load and slow CPU cause high latencies under heavy load
+	Synchronous Non blocking vs asynchronous no blokcing I/O
+
+
+
+==========================================================
+
+MultiProcessing in Python
+
+https://docs.python.org/3.6/library/multiprocessing.html?highlight=process#programming-guidelines
+
+PIPE/Queue/Socket
+
+Polling
+
+
+
+
+GIL Lock runs in a single process(all theads - 1 core other cores wasted)
+	cpython shared locking to access
+Multiprocessing
+    Pool,Map
+      Used to split across cores,no state
+    Process,Event,Queue / Pipe
+      obseve process,enqueue and dequeue events (best model for state)
+Asyncio
+    I/O intensive python with multiple cores used
+
+messaging
+    multiprocessing module
+    process /queue(object-PIPE)
+
+
+
+Tip
+	No share pass resources
+        cleanup
+        TERM /INT
+
+
+
+
+============================================IPC==========================================================
+OS:
+message passing vs shared memory
+
+PIPE/QUEUE/SOCKET
+
+CLIENT-SERVER
+	CONNECTIONS
+
+TECHNIQUE
+	Blocking send blocking receive
+        non blocking send blocking receive
+        blocking send non blocking receive
+	
+   MECHANISM
+	SYNC OR ASYNC
+
+SERVER ARCHITECTURE
+      point to SERVER TRADEOFF(above page)
+
+CLIENT ARCHTECTURE
+
+
+
+========================================SYNCHRONIZATION ==================================================
+
+
+Barrier
+mutex(lock)
+Semaphore/bounded
+event
+condition
+
+Locking
+mutex/semaphore
+Event
+	thread /waitfor/signal
+
+JAVA
+	Blocing queue produer-consumer
+await	concurrent hashmap (part of queue blocked on write/read not blocked)
+	Countdown latch (wait on a counter that reahces till 0) block until then(thread)
+	Cyclic Barrier(wait for threads to jon in same algo)
+lock,acquire	
+        Semaphore(counting threads at critical section)
+Executor 
+	Threadpools and task executors/execute,submit/invokeall (threaded i/0 	m:n model)
+	execute runnable - async (async i/o)
+	submit runnable - future object (async i/o)
+        3.4. ForkJoinPool (work stealing)
+
+
+
+wait - notify make it sleep and wake it from sleep
+https://www.baeldung.com/thread-pool-java-and-guava
+
+========================================SERVER ===============================
+
+THREAD(shared) OR PROCESS(queue/event/task/pool)
+
+
+SOCKET(Connection)
+	tcp/udp/raw use ports
+
+POLLING
+
+
+ZEROMQ
+
+	REQ-REP
+	REQ-REP Async
+	PUSH-PULL
+	PUB-SUB
+	ROTER
+
+	PROC:	
+		inproc
+		tcp
+		rpc
+	mechanism
+		use message queue for every pair of socket
+		higher throughput through batch send
+		Message oriented, framing ,async, batching.multi send etc..
+
+MESSAGE
+
+	TCP
+		sender memory				sender queue(addon)
+			buffer				kernel buffer
+			   wire
+			     recevier buffer
+				receiver memory
+
+THREADING
+
+multithreading vs non blocking i/o vs signals
+can run on multiple cores
+
+https://en.wikipedia.org/wiki/Thread_(computing)#Models
+MUTLTI CORE THREADS
+	Underlying ARCHITECTURE takes care of how threads run.
+	concurrent in  one core vs parallel on multiple cores
+
+GPU CUDA: 100 CORES 100 THREADS IN PARALLEL.
+
+THREAD can block process in many to one model
+
+
+PREEMPTIVE VS COOPERATIVE(Scheduling)
+	OS takes control / thread relinquish control of os
+			  / can create problem it it blockes and cause others to starve
+
+processes can decrease thread switch time.
+
+kernel threads	 can run on multiple cores (by preemptive process scheduler) advantage/ no yielding or scheduling /blocking calls
+		 kernel switch overhead (1:1)
+		
+		EG: ntpl,linux,win32
+user threads    run in user space and can be scheduled very fast
+		blocks entire process on I/O since blocked thread/system call makes it wait and doesnt give cpu to other threads
+
+		solution:	
+			Use nonblocking i/o and schedule another thread for processing (N:1)
+                EG: GNU
+
+kernel thread/user thread /fiber(application scheduling and cooperative)
+
+parallelism
+
+4/1/0
+
+context switch(Concurrency)
+
+slow/very fast/
+
+M:N
+	POSIX threads hybrid
+
+Syncrionization in threads
+	Can be though,
+        mutex/locks
+
+        uniprocess:
+		waiting on lock /sleep /context switch
+       multiprocess:
+                poll the mutex on a spinlock
+
+Properties Failed: Understandability,Determinism,predictability
+
+
+
+=============================JAVA CONCURRENCY and JAVA SYNHRONIZATION==================================================================
+
+Concurrency models
+
+Producer-Consumer
+
+	fast producer(many) - Queue(Buffer) -Consumer (many)
+Half life async sync
+Active objects
+	ORM
+		.save()
+Monitor
+Leader/follower
+
+
+No more synchronized on all objects for thread access
+	Map
+		Use syncronized put/get
+		Use read/write locks
+
+
+parallel worker
+JOB QUEUE
+	WORKERS 
+		RUN ON MULTIPLE THREADS
+			ON MULTIPLE CPUS
+
+
+assmbly model(no shared state/non blocking i/o)
+	reactive(node.js)
+	actor/channel worker
+
+functional parallelism
+ 	all functions
+
+=======================CONCURRENCY VS PARALLELISM ==========================================
+
+	DIFFERENT TASKS MAKE PROGRESS VS SAMETASKS WILL MAKE PROGRESS ON 4 CPUS
+
+==================THREAD POOL DISADVANTAGES ======================
+
+long no of small running tasks
+
+blocking requests
+
+	cpu bound 	-optimal N CORES
+	i/o bound       - optimal 3n cores
+
+
+
+===================CONCURRENT MODELS ============================================================
+
+SYNCHRONOUS BLOCKING  - THREADS
+SYNCRHONOUS NON BLOCKING - EVENT/POLL in sockets webservers
+ASYNCHRONOUS EVENTS - event polling and event handlers and callbacks (nodejs)
+			concurrency without threads single threaded event loop
+
+
+Thread Models
+Concurrency Models
+Memory Models
+
+Map <Lock types,Service(execute/threadpool),Concurrencymodel(activeobject)>
+
+Concurrency Models:
+
+task-task
+task-memory
+
+Java offers monitors on objects
+Active/producer/Monitors
+Monitor/locsk/semaphhore (type of locks)
+	Synchronized/lock/Semaphore/Latch/Barrier
+Task decompostion /Data decomposition
+
+
+Thread Creation & Execution
+	Executors
+		Threadpoolrexec,scheduledthreadpool,Callable,Future
+
+Fine Grained
+	fork-join 
+
+Worker Queues
+	prefork(multiprocessing)
+	worker mpm - apache multithreading
+	Dispatch thread - worker queue(nginx)
+	Nodejs main thread - worker pool(nodejs)
+
+
+
+
+Streams
+
+Concurrent Data strurctures
+
+SYNCHRONIZATION
+
+Design Patterns in Concurrency
+	Singaling
+		wait/notify
+	Rendezvous
+	Mutex
+		syncronized/lock/semaphore
+		two objects
+	Multiplex
+		semaphore
+
+	Barrier
+		Common point
+	double check locking
+		singleton,lazy initilzation
+	Read-write lock
+	
+	Threadpool
+
+Lowlevel vs high lveel
+	threads vs Executtors and services

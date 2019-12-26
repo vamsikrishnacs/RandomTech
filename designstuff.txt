@@ -1,0 +1,107 @@
+Design
+ecommerce done							OOPS
+booking(hotel,flight,car,bus,room ?) done				OOPS
+messenger(fb,whatsapp)				->Connections/Timeline/Cache
+Rentals  done					->
+social(timeline,insta,) 
+filesharing(dropbox,edit)			->Files,Chunks,Permissions
+Youtube                                         -> Streaming
+commute(Uber,nearby,yelp)			->Maps based
+Banking(customer,credit,debit)			->		OOPS
+oops(library,hospital)						OOPS
+game(chess,deck)				->Controller
+Blogging/Notification/Recommendation
+
+commerce/booking/
+
+
+        Cart Manangement
+		Category->products
+		Cart -> OrderItems(Inventory)
+			addItem()
+			compute_bill(CartItemid,offer)
+
+		Offer ->
+			type- 1plus1,cardbased,promotion
+
+                CartItem->Offer module 
+
+
+	Order Management Module
+		Cart -verify
+			pay(Payment)
+		Booking Details(add to reservation)
+                Billingaddress,confirm,Paymentstatus,Warehouse
+
+	Payment Module
+		cart.pay(Payment)
+                Payment
+			type-atm,debit,credit,emi
+			Pay()
+				
+commerce/booking/Uber/Rental/social/oops
+        User Module:
+		User -> Type(Customer,Admin, Supervisor,Staff,)
+			
+			Account ->Credit/Saving
+			User ->Patient,Hospital Staff
+					Techincal/Medical/Managament
+
+			User -> Student,Librarian,Support
+
+			
+			login()
+			
+        Search Module:
+		getByProductId
+
+	Display:
+		Inheritance(isa),Association(one-one),Aggregation(course-student,category-product),Compostion(doc-page)
+		Hospital-Deps,Dep-Teams,Team-Doctors,Univeristy-Courses,Course-Students,Category-Products,City-Cinemas,Cinema-Theatres,City-Locations,Location-cabs,Bank-Departments,Catelogue-Books,Game-Squares,Deck-Cards
+
+                Product-CartItem,Cinema-Movie,Slot-Vehicle,Course-student,Account-Customer,Square-Piece,
+
+	Inheritance
+		Enums- Book ->Journal/Periodical/Textbook/ResearchPaper/
+		       Room -> Deluxe/Normal/Suite
+		       Product -> Electronics/Motors/Clothing/Fashion/Home/Furiture
+		       Cab -> Mini/Suv/Sedan
+                       Route -> Domestic/International
+		       Card -> Jack/Ace/Spade/Heart/Diamond
+
+
+
+Contollers/Patterns (????)
+
+=====================================NEXT ====================================================
+
+Endpoints(read/writes)
+Synchronization blocks
+
+Concurrency
+	Optimistic/Pessimistic
+	Threads/Process
+	Sync/Async event driven
+Connections
+DBS
+Case studies(DB)
+
+Realtime/Distributed Systems/Streams
+
+ThreadSafe Collections/Classes
+Large file searching/Btrees
+How do you consume info from an API which produces data faster than you can consume ?
+Session Management
+Scheduler Design
+Seat Booking/Concurrent and selection
+timers/jvm/singleton
+Serialization/DeSerialization
+IPC
+
+
+
+
+
+
+
+
