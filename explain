@@ -1,0 +1,19 @@
+application
+	
+how
+	Concurenncy is hanlded(threads/aio/)
+	ipc is handled (blocking/non blocking/connections(push.pull.sse.ws)/protocols)
+	synchonization is handled (higherlevel locks/transactions) 
+		with
+			processing/memory/disk/network limits 
+	using
+		frameworks	like
+			zeromq(o buffer sockets)
+			MQ(rabbit/kafka/sqs)
+			
+	along with 
+		patters(sync/async,push-pull,req-rep,pub-sub) thread-thread
+		messaging layer(async subscribers and workers) queue-worker (hard)
+		MQ's  queue-consumer (soft)
+		events (event,queue,handlers/async i/o,single thread)
+					

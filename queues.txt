@@ -1,0 +1,43 @@
+push vs pull (speed vs load) param: connections/servers/poll/tcp
+	cons:
+		push - idle tcp connections/speed but load sacrificed
+		pull - poll/lesser speed
+sns pub sub
+sqs long polling /delete message
+
+rabbitmq push - idle connections with scalability
+
+pull -
+	single server - multiple consumers
+		increased load bcoz of frequency in single server
+		long polling/short polling
+	distributed server - dsitributed hits on different servers(SQS)
+		still low load on each server
+
+global state vs eventual consistency
+
+semantics
+	atleast once
+	atmost once
+
+push/pull
+	websocket/sse/short polling/long polling
+
+i/o
+	i/o completion port/queue/ threadpool
+
+	async - good for large files
+
+	readiness notification -kernel tells which fd is ready
+		use select/poll for fd
+		blocks on disk/io (use threads to handle to disk i/o)
+	change notification - give kernel a fd- kernel notify when fd transition from not ready to ready
+		use kqueue/epoll
+	aio
+		i/o completion ports on windows
+	threading
+
+
+zeromq
+	how much kernel buffer can hold
+	when data transfer from kernel buffer to application buffer happens and what interval

@@ -1,0 +1,62 @@
+c10k
+	MAIN
+		THREADS USE STACK MEMORY AND MORE AND MORE MEMORY
+		1000 TPS AND LATENCY 2SEC - 2000 CONCURRENT
+		1000TPS  AND LATENCY 10 SEC  - LESS CONCURRENT
+
+	socket/kernel
+
+leave the kernel
+	because
+		network stack for each packet
+		going through 5000 lookups(threads) for 5000 connections in kernel to identify the handler thread
+		thread management
+
+packet scalability
+	route packets without network
+
+memory scalability
+	use preallocate/memory per thread etc..
+	
+core scalability
+	use thread per core - 1:1 or mulithreading or hypervisor
+	run threads on max cores
+        use incore datastructures to avoid locking
+
+issues in many process
+	swapping of frames
+	memory resources/Segmenation and Disk Blocks
+	kernel doing the right process swapping in swapping out and identifying the thread
+	disk access speed
+	disk fragmentation
+	
+
+os
+	process scheduling cpu
+	memory managament memory
+		paging and segmentation
+		logical address space/physical address space
+		pages
+		swap space on hard disk
+	file systems disk
+		i/o scheduling
+			device queue
+		buffering	
+			speed mismatch/different transfer size/copy semantic buffer/disk(write)
+		Spooling
+		inodes
+			datablock,special block for filestructure,pointers,superblock
+		sequential access/direct access/index sequential access
+		files/disk blocks
+			contiguous(1,2,fast)/linkedlist(1,slow)/indexed(1,2)
+			indirection for large files
+			
+        network i/o  network
+	
+	security
+		runlevels	/etc/init.d rc.d
+		suoders		/etc/sudoers
+        ipc
+        virtualization
+		cgroups vs hypervisor
+	
